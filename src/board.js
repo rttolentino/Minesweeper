@@ -1,52 +1,4 @@
-class Game
-{
-	constructor(rows, cols, bombs)
-	{
-		this._board = new Board(rows, cols, bombs);
-	}
-
-	// Setters
-	//set board(rows, cols, bombs)	{this._board = new Board(rows, cols, bombs);}
-
-	// Getters
-	get board()	{return this._board;}
-
-	// Methods
-	playMove(row, col)
-	{
-		console.log(`Guess: ${row}, ${col}`);
-		console.log(`Bombs: ${this.board.bombs}`);
-
-		if(row > -1 && row < this.board.playerBoard.length &&
-			 col > -1 && col < this.board.playerBoard[0].length)
-		{
-
-			this.board.flipTile(row, col);
-
-			if(this.board.playerBoard[row][col] === `B`)
-			{
-				console.log(`Oh no! You hit a bomb...`);
-			}
-			else if(!this.board.safeTiles())
-			{
-				console.log(`You did it! You've located all the bombs! Winner Winner Chicken Dinner!`);
-			}
-			else
-			{
-				console.log(`Current Board:`);
-			}
-		}
-		else
-		{
-			console.log(`That is an invalid guess.`);
-		}
-		this.board.printBoard();
-	}
-
-	// Static Methods
-}
-
-class Board
+export class Board
 {
 	constructor(rows, cols, bombs)
 	{
@@ -60,10 +12,7 @@ class Board
 	}
 
 	// Setters
-	//set tiles(rows, cols)							{this._times = rows * cols;}
-	set bombs(bombs)									{this._bombs = bombs;}
-	//set playerBoard(rows, cols)				{this._playerBoard = Board.generatePlayerBoard(rows, cols);}
-	//set bombBoard(rows, cols, bombs)	{this._bombBoard = Board.generateBombBoard(rows, cols, bombs);}
+  // N/A
 
 	// Getters
 	get tiles()				{return this._tiles;}
@@ -72,6 +21,7 @@ class Board
 	get bombBoard()		{return this._bombBoard;}
 
 	// Methods
+  // Flip a tile at given "rowIndex" and "colIndex". Update playerBoard as necessary.
 	flipTile(rowIndex, colIndex)
 	{
 		const numRows = this.bombBoard.length;
@@ -101,9 +51,10 @@ class Board
 		this._tiles--;
 	}
 
+  // Report number of bombs in surrounding 9 tiles (up, down, left, right, and diagonals).
 	getNeighborBombs(rowIndex, colIndex)
 	{
-		const neighborOffsets = [[-1,-1], [-1,0], [-1,1], [0,-1], [0,1], [1,-1], [1,0], [1,-1]];
+		const neighborOffsets = [[-1,-1], [-1,0], [-1,1], [0,-1], [0,1], [1,-1], [1,0], [1,1]];
 		const numRows = this.bombBoard.length;
 		const numCols = this.bombBoard[0].length;
 		let numBombs = 0;
@@ -120,36 +71,43 @@ class Board
 						numBombs++;
 			}
 		});
+
 		return numBombs;
 	};
 
+  // Return boolean on whether there are still safe tiles left for the user to select.
 	safeTiles()
 	{
-		return this.tiles !== this.bombs;
+		return this.tiles > this.bombs;
 	}
 
-	printBoard()
+  // Print board to console.
+	printBoard(board)
 	{
-		this._playerBoard.forEach(tile => console.log(tile.join(" | ")));
+		board.forEach(tile => console.log(tile.join(" | ")));
 	}
 
 	// Static Methods
+  // Generate the board the player will see during gameplay.
 	static generatePlayerBoard(numRows, numCols)
 	{
 		let board = [];
+
 		for(let r = 0; r < numRows; r++)
 		{
 			let row = [];
+
 			for(let c = 0; c < numCols; c++)
 			{
 				row.push(" ");
 			}
 			board.push(row);
 		}
-		//board.forEach(b => console.log(b.join(" | ")));
+
 		return board;
 	};
 
+  // Generate board with randomized bomb locations. Not seen by player.
 	static generateBombBoard(numRows, numCols, numBombs)
 	{
 		if(numBombs >= numRows*numCols) {numBombs = numRows*numCols - 1;}
@@ -158,6 +116,7 @@ class Board
 		for(let r = 0; r < numRows; r++)
 		{
 			let row = [];
+
 			for(let c = 0; c < numCols; c++)
 			{
 				row.push(" ");
@@ -180,10 +139,3 @@ class Board
 		return board;
 	};
 }
-
-let boardRows = Math.floor(Math.random()*3)+3;
-let boardCols = Math.floor(Math.random()*3)+3;
-
-const g = new Game(boardRows, boardCols, Math.round(Math.random()*(boardRows*boardCols))+1);
-g.playMove(Math.floor(Math.random()*g.board.playerBoard.length), Math.floor(Math.random()*g.board.playerBoard[0].length));
-//g.playMove(Math.floor(Math.random()*g.board.playerBoard.length)*(Math.round((Math.random()*2)-1)), Math.floor(Math.random()*g.board.playerBoard[0].length)*(Math.round((Math.random()*2)-1)))
